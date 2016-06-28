@@ -160,3 +160,7 @@ class VentureBQL(object):
       #print 'bql call: joined'
       self._thread = None
       return True, token
+
+# XXX Distinguish me!
+class VentureMML(VentureBQL):
+  pass

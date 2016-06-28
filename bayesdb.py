@@ -7,7 +7,7 @@ import venture.lite.sp_help as sp
 import venture.lite.types as t
 import venture.lite.value as vv
 
-class PopulationPSP(psp.DeterministicPSP):
+class BayesDB_PSP(psp.DeterministicPSP):
   def simulate(self, args):
     pathname = args.operandValues()[0]
     bdb = bayeslite.bayesdb_open(pathname)
