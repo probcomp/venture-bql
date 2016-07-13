@@ -2,6 +2,7 @@
 
 from bayesdb import BAYESDB_SPS
 from bql import VentureBQL
+from bql import VentureMML
 
 def __venture_start__(ripl):
   for name, sp in BAYESDB_SPS:

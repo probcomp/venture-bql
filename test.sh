@@ -13,15 +13,15 @@ go ()
 
 go <<EOF
 load_plugin plugin.py
-assume pop = bayesdb_population("foo.bdb")
-define rows = run(sample bayesdb_bql(pop, "select * from sqlite_master"))
+assume bdb = bayesdb_open("foo.bdb")
+define rows = run(sample bayesdb_bql(bdb, "select * from sqlite_master"))
 print(rows)
 EOF
 
 go <<EOF
 load_plugin plugin.py
-assume pop = bayesdb_population("foo.bdb")
-assume rows = @bql (pop) { select * from sqlite_master; };
+assume bdb = bayesdb_open("foo.bdb")
+assume rows = @{bql (bdb) { select * from sqlite_master; }};
 print(sample rows)
 EOF
 

@@ -57,8 +57,8 @@ def venture2bql(x):
   raise ValueError('Unrepresentable value from BQL: %r' % (x,))
 
 BAYESDB_SPS = [
-  ('bayesdb_population',
-    sp.typed_nr(PopulationPSP(), [t.StringType()], t.AnyType('population'))),
+  ('bayesdb_open',
+    sp.typed_nr(BayesDB_PSP(), [t.StringType()], t.AnyType('population'))),
   ('bayesdb_bql',
     sp.typed_nr(BQL_PSP(),
       [t.AnyType('population'), t.StringType(), t.ArrayType()],
