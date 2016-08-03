@@ -83,7 +83,7 @@ class VentureBQLScanner(Plex.Scanner):
 HUNGRY_TOKEN = ['hungry']
 DEAD_CHAR = ['dead']
 
-class Dead:
+class Dead(Exception):
   pass
 
 class Reader(object):
