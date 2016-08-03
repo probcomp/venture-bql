@@ -1,8 +1,6 @@
 # -*- Mode: Python; coding: utf-8; python-indent-offset: 2 -*-
 
-import Queue
 import StringIO
-import threading
 
 import bayeslite
 
@@ -11,6 +9,7 @@ from bayeslite.parse import bql_string_complete_p
 import venture.plex as Plex
 import venture.value.dicts as vv
 from venture.parser import ast
+from venture.parser.venture_script import subscanner
 
 class VentureBQLScanner(Plex.Scanner):
   def __init__(self, stream):
@@ -78,61 +77,10 @@ class VentureBQLScanner(Plex.Scanner):
     ]),
   ])
 
-HUNGRY_TOKEN = ['hungry']
-DEAD_CHAR = ['dead']
 
-class Dead(Exception):
-  pass
-
-class Reader(object):
-  def __init__(self, char_queue, token_queue):
-    self._char_queue = char_queue
-    self._token_queue = token_queue
-
-  def read(self, _n):
-    self._token_queue.put(HUNGRY_TOKEN)
-    char = self._char_queue.get()
-    if char is DEAD_CHAR:
-      raise Dead
-    return char
-
-def _scan_bql_thread(char_queue, token_queue):
-  try:
-    reader = Reader(char_queue, token_queue)
-    scanner = VentureBQLScanner(reader)
-    token, _text = scanner.read()
-    token_queue.put(token)
-  except Dead:
-    pass
-
-class VentureBQL(object):
+class VentureBQL(subscanner.Scanner):
   def __init__(self):
-    char_queue = Queue.Queue()
-    token_queue = Queue.Queue()
-    self._thread = threading.Thread(
-      target=_scan_bql_thread, args=(char_queue, token_queue))
-    self._char_queue = char_queue
-    self._token_queue = token_queue
-
-    self._thread.start()
-    token = self._token_queue.get()
-    assert token is HUNGRY_TOKEN
-
-  def __del__(self):
-    if self._thread is not None:
-      self._char_queue.put(DEAD_CHAR)
-      self._thread.join()
-      self._thread = None
-
-  def __call__(self, text):
-    self._char_queue.put(text)
-    token = self._token_queue.get()
-    if token is HUNGRY_TOKEN:
-      return False, None
-    else:
-      self._thread.join()
-      self._thread = None
-      return True, token
+    super(VentureBQL, self).__init__(VentureBQLScanner)
 
 # XXX Distinguish me!
 class VentureMML(VentureBQL):
