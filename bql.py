@@ -10,6 +10,7 @@ from bayeslite.parse import bql_string_complete_p
 
 import venture.plex as Plex
 import venture.value.dicts as vv
+from venture.parser import ast
 
 class VentureBQLScanner(Plex.Scanner):
   def __init__(self, stream):
@@ -34,15 +35,12 @@ class VentureBQLScanner(Plex.Scanner):
   def _scan_bql_maybe_end(self, text):
     assert text == '}'
     if bql_string_complete_p(self._bql.getvalue()):
-      def located(loc, value):
-        # XXX Refer to Venture's definition.
-        return {'loc': loc, 'value': value}
-      operator = located([0, self.cur_pos - 1], vv.symbol('bayesdb_bql'))
-      population = located(self._name_position, vv.symbol(self._name))
-      bql = located(
+      operator = ast.Located([0, self.cur_pos - 1], vv.symbol('bayesdb_bql'))
+      population = ast.Located(self._name_position, vv.symbol(self._name))
+      bql = ast.Located(
         [self._bql_start, self.cur_pos - 1],
         vv.string(self._bql.getvalue()))
-      self.produce(located([0, self.cur_pos - 1], [operator, population, bql]))
+      self.produce(ast.Located([0, self.cur_pos - 1], [operator, population, bql]))
     else:
       self._bql.write(text)
 
