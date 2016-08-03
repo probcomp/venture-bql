@@ -22,7 +22,7 @@ go <<EOF
 load_plugin plugin.py
 assume bdb = bayesdb_open("foo.bdb")
 assume rows = @{bql (bdb) { select * from sqlite_master; }};
-print(sample rows)
+print(run(sample rows))
 EOF
 
 # print(sample rows)
