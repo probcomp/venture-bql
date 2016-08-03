@@ -54,7 +54,7 @@ def venture2bql(x):
     return unicode(x.getString(), 'UTF-8')
   if isinstance(x, vv.VentureNil):
     return None
-  raise ValueError('Unrepresentable value from BQL: %r' % (x,))
+  raise ValueError('Unrepresentable value for BQL: %r' % (x,))
 
 BAYESDB_SPS = [
   ('bayesdb_open',
