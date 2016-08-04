@@ -1,0 +1,35 @@
+// Run me with venture -L plugin.py -f sprinkler-demo.vnts
+
+assume rain = flip(0.1);
+assume sprinkler = flip(0.5);
+assume wet_chance =
+  if (rain && sprinkler) { 0.99 }
+  else { if (rain) { 0.9 }
+  else { if (sprinkler) { 0.8 }
+  else { 0.05 } } };
+assume wet = flip(wet_chance);
+
+define extract = () -> {
+  list(run(sample rain), run(sample sprinkler), run(sample wet)) };
+
+define bdb = bayesdb_open("sprinkler.bdb");
+@{sql (bdb) {CREATE TABLE IF NOT EXISTS rundata(rain CATEGORICAL, sprinkler CATEGORICAL, wet CATEGORICAL)}};
+
+define prior_row = {
+  reset_to_prior;
+  return(bayesdb_sql(bdb, "INSERT INTO rundata VALUES (?, ?, ?)", extract())) };
+
+repeat(20, prior_row);
+
+define rows = @{bql (bdb) { select * from rundata; }};
+print(rows);
+
+@{mml (bdb) {
+  CREATE GENERATOR rundata_cc FOR rundata USING crosscat
+    (rain CATEGORICAL, sprinkler CATEGORICAL, wet CATEGORICAL);}};
+@{mml (bdb) {
+  INITIALIZE 10 MODELS FOR rundata_cc;}};
+@{mml (bdb) {
+  ANALYZE rundata_cc FOR 10 ITERATIONS WAIT;}};
+
+print(@{bql (bdb) { SIMULATE rain, sprinkler, wet FROM rundata_cc LIMIT 50;}});
