@@ -1,5 +1,6 @@
 # -*- Mode: Python; coding: utf-8; python-indent-offset: 2 -*-
 
+import re
 import StringIO
 
 import bayeslite
@@ -85,3 +86,19 @@ class VentureBQL(subscanner.Scanner):
 # XXX Distinguish me!
 class VentureMML(VentureBQL):
   pass
+
+def mk_venture_sql_scanner():
+  # XXX This is needlessly slow; rewrite as a proper parser like above
+  text_box = [""]
+  def new_char(incoming):
+    text_box[0] = text_box[0] + incoming
+    m = re.match(r" *\(([a-zA-Z]+)\) *\{(.*)\} *\}", text_box[0])
+    if m:
+      print m, m[1], m[2]
+      operator = ast.Located([0, 0], vv.symbol('bayesdb_sql'))
+      population = ast.Located([0, 0], vv.symbol(m[1]))
+      sql = ast.Located([0, 0], vv.string(m[2]))
+      return (True, ast.Located([0,0], [operator, population, sql]))
+    else:
+      return (False, None)
+  return new_char
