@@ -63,6 +63,8 @@ def venture2bql(x):
     return x.getInteger()
   if isinstance(x, vv.VentureString):
     return unicode(x.getString(), 'UTF-8')
+  if isinstance(x, vv.VentureBool):
+    return x.getBool()
   if isinstance(x, vv.VentureNil):
     return None
   raise ValueError('Unrepresentable value for BQL: %r' % (x,))
