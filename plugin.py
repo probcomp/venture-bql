@@ -7,5 +7,6 @@ from bql import VentureMML
 def __venture_start__(ripl):
   for name, sp in BAYESDB_SPS:
     ripl.bind_foreign_sp(name, sp)
+    ripl.bind_foreign_inference_sp(name, sp)
   ripl.register_language('bql', VentureBQL)
   ripl.register_language('mml', VentureMML)
