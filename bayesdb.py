@@ -71,7 +71,7 @@ BAYESDB_SPS = [
   ('bayesdb_open',
     sp.typed_nr(BayesDB_PSP(), [t.StringType()], t.AnyType('population'))),
   ('bayesdb_sql',
-    sp.typed_nr(BQL_PSP(),
+    sp.typed_nr(SQL_PSP(),
       [t.AnyType('population'), t.StringType(), t.ArrayType()],
       t.ArrayType(),
       min_req_args=2)),
