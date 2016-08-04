@@ -34,6 +34,17 @@ class BQL_PSP(psp.DeterministicPSP):
     results = bdb.execute(phrase, parameters).fetchall()
     return tuple(bql2venture(x) for row in results for x in row)
 
+class SQL_PSP(psp.DeterministicPSP):
+  def simulate(self, args):
+    bdb = args.operandValues()[0].datum
+    phrase = args.operandValues()[1]
+    if len(args.operandValues()) == 3:
+      parameters = tuple(venture2bql(x) for x in args.operandValues()[2])
+    else:
+      parameters = None
+    results = bdb.sql_execute(phrase, parameters).fetchall()
+    return tuple(bql2venture(x) for row in results for x in row)
+
 def bql2venture(x):
   if isinstance(x, float):
     return vv.VentureNumber(x)
@@ -59,6 +70,11 @@ def venture2bql(x):
 BAYESDB_SPS = [
   ('bayesdb_open',
     sp.typed_nr(BayesDB_PSP(), [t.StringType()], t.AnyType('population'))),
+  ('bayesdb_sql',
+    sp.typed_nr(BQL_PSP(),
+      [t.AnyType('population'), t.StringType(), t.ArrayType()],
+      t.ArrayType(),
+      min_req_args=2)),
   ('bayesdb_bql',
     sp.typed_nr(BQL_PSP(),
       [t.AnyType('population'), t.StringType(), t.ArrayType()],
